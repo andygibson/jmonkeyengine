@@ -52,7 +52,7 @@ public class ArmatureMask implements AnimationMask {
      */
     public ArmatureMask removeJoints(Armature armature, String... jointNames) {
         for (String jointName : jointNames) {
-            Joint joint = findJoint(armature, jointName);
+            Joint joint = getJoint(armature, jointName);
             int jointId = joint.getId();
             affectedJoints.clear(jointId);
         }
@@ -89,26 +89,25 @@ public class ArmatureMask implements AnimationMask {
     public static ArmatureMask createMask(Armature armature, String... joints) {
         ArmatureMask mask = new ArmatureMask();
         mask.addBones(armature, joints);
-        for (String joint : joints) {
-            mask.affectedJoints.set(armature.getJoint(joint).getId());
-        }
         return mask;
     }
 
     /**
      * Add joints to be influenced by this animation mask.
-     * 
+     *
      * @param armature the Armature containing the joints
      * @param jointNames the names of the joints to be influenced
      */
     public void addBones(Armature armature, String... jointNames) {
         for (String jointName : jointNames) {
-            Joint joint = findJoint(armature, jointName);
-            affectedJoints.set(joint.getId());
+            Joint joint = armature.getJoint(jointName);
+            if (joint != null) {
+                affectedJoints.set(joint.getId());
+            }
         }
     }
 
-    private Joint findJoint(Armature armature, String jointName) {
+    private Joint getJoint(Armature armature, String jointName) {
         Joint joint = armature.getJoint(jointName);
         if (joint == null) {
             throw new IllegalArgumentException("Cannot find joint " + jointName);
@@ -123,7 +122,7 @@ public class ArmatureMask implements AnimationMask {
      * @param jointName the names of the ancestor joint
      */
     public void addFromJoint(Armature armature, String jointName) {
-        Joint joint = findJoint(armature, jointName);
+        Joint joint = getJoint(armature, jointName);
         recurseAddJoint(joint);
     }
 
